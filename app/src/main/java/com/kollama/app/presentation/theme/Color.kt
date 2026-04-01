@@ -1,4 +1,4 @@
-package com.kollama.app.ui.theme
+package com.kollama.app.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
