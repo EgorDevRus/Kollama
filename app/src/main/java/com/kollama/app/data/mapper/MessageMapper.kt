@@ -11,7 +11,10 @@ fun MessageEntity.toDomain() = ChatMessage(
     id = id,
     chatId = chatId,
     text = text,
-    role = MessageRole.valueOf(role), // Превращает строку в Enum
+
+    // Превращает строку в Enum
+    role = MessageRole.entries.find { it.name == role } ?: MessageRole.USER,
+
     timestamp = timestamp
 )
 
