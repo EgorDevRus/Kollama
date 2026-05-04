@@ -14,6 +14,6 @@ class GetChatHistoryUseCase (private val repository: ChatRepository){
      * @return Поток со списком всех сообщений, отсортированных по времени
      */
     operator fun invoke(chatId: String) : Flow<List<ChatMessage>> {
-        return repository.getChatHistory(chatId)
+        return repository.getChatHistoryFlow(chatId)
     }
 }

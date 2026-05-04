@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
  */
 interface ChatRepository {
     /** Получает поток всех сообщений, отсортированных по дате */
-    fun getChatHistory(chatId: String) : Flow<List<ChatMessage>>
+    fun getChatHistoryFlow(chatId: String) : Flow<List<ChatMessage>>
     /** Сохраняет новое сообщение пользователя в базу данных */
     suspend fun sendMessage(chatId: String, text: String)
     /** Запрашивает поток ответа у нейросети (стриминг) */
