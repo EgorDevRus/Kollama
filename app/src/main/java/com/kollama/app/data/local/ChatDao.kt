@@ -13,10 +13,11 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ChatDao {
     /**
-     * Получает список всех сообщений для конкретного чата
+     * Получает поток сообщений для конкретного чата
+     * Список автоматически обновляется при любом изменении в таблице
      */
     @Query("SELECT * FROM chat_messages WHERE chatId = :chatId ORDER BY timestamp ASC")
-    fun getMessageByChatId(chatId: String): Flow<List<MessageEntity>>
+    fun getMessageFlow(chatId: String): Flow<List<MessageEntity>>
 
     /**
      * Сохраняет новое сообщение в БД
@@ -30,5 +31,11 @@ interface ChatDao {
      */
     @Query("DELETE FROM chat_messages WHERE chatId = :chatId")
     suspend fun clearChatHistory(chatId: String)
+
+    /**
+     * Обновление текста для стриминга
+     */
+    @Query("UPDATE chat_messages SET text = :newText WHERE id = :messageId")
+    suspend fun updateMessageText(messageId: String, newText: String)
 
 }
