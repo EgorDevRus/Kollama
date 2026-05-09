@@ -1,5 +1,6 @@
 package com.kollama.app.data.remote
 
+import com.kollama.app.utils.Constants
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.DefaultRequest
@@ -37,7 +38,10 @@ fun provideHttpClient(): HttpClient {
             })
         }
         install(DefaultRequest) {
-            // Указываем что передаём данные в формате JSON
+            // Базовый адрес
+            url(Constants.BASE_URL)
+
+            // Указываем, что передаём данные в формате JSON
             header("Content-Type", "application/json")
         }
 
@@ -48,7 +52,7 @@ fun provideHttpClient(): HttpClient {
         }
 
         install(Logging) {
-            level = LogLevel.BODY
+            level = LogLevel.ALL
             logger = Logger.DEFAULT
         }
     }
