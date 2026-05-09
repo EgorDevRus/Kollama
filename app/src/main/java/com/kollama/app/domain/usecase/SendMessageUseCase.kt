@@ -2,6 +2,8 @@ package com.kollama.app.domain.usecase
 
 import com.kollama.app.domain.repository.ChatRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 
 /**
  * Отправка запроса нейросети и ответ от нее в реальном времени
@@ -13,8 +15,10 @@ class SendMessageUseCase (private val repository: ChatRepository) {
      * @param text Текст сообщения от пользователя
      * @return Поток строк (стриминг) с ответом от Ollama
      */
-    suspend operator fun invoke(chatId: String, text: String): Flow<String> {
+    operator fun invoke(chatId: String, text: String): Flow<String> = flow {
         repository.sendMessage(chatId, text)
-        return repository.getLiveResponse(chatId,text)
+
+        // Вывод пока текст от нейронки не закончится
+        emitAll(repository.getLiveResponse(chatId, text))
     }
 }
