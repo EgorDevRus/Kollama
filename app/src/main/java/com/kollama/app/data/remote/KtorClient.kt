@@ -1,6 +1,5 @@
 package com.kollama.app.data.remote
 
-import com.kollama.app.utils.Constants
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.DefaultRequest
