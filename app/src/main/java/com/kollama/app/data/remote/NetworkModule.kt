@@ -38,9 +38,6 @@ fun provideHttpClient(): HttpClient {
             })
         }
         install(DefaultRequest) {
-            // Базовый адрес
-            url(Constants.BASE_URL)
-
             // Указываем, что передаём данные в формате JSON
             header("Content-Type", "application/json")
         }
@@ -52,7 +49,7 @@ fun provideHttpClient(): HttpClient {
         }
 
         install(Logging) {
-            level = LogLevel.ALL
+            level = LogLevel.NONE
             logger = Logger.DEFAULT
         }
     }
