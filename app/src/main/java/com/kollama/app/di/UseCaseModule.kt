@@ -2,6 +2,7 @@ package com.kollama.app.di
 
 import com.kollama.app.domain.usecase.ClearHistoryUseCase
 import com.kollama.app.domain.usecase.GetChatHistoryUseCase
+import com.kollama.app.domain.usecase.GetModelsUseCase
 import com.kollama.app.domain.usecase.RegenerateResponseUseCase
 import com.kollama.app.domain.usecase.SendMessageUseCase
 import org.koin.dsl.module
@@ -15,4 +16,5 @@ val useCaseModule = module {
     factory { GetChatHistoryUseCase(get()) }
     factory { RegenerateResponseUseCase(get()) }
     factory { SendMessageUseCase(get()) }
+    factory { GetModelsUseCase(get()) }
 }

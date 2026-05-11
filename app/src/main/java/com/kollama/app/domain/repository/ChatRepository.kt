@@ -23,4 +23,7 @@ interface ChatRepository {
 
     /** Удаляет историю чата */
     suspend fun clearHistory(chatId: String)
+
+    /** Получаем список моделей от Ollama */
+    suspend fun getModels(ip: String): List<String>
 }

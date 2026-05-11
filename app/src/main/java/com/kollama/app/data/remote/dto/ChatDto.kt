@@ -40,3 +40,23 @@ data class ChatResponse(
     val message: ChatMessageDto ? = null,
     val done: Boolean
 )
+
+/**
+ * Ответ от сервера Ollama со списком доступных моделей
+ *
+ * @property models Список объектов, описывающих каждую установленную модель
+ */
+@Serializable
+data class ModelsResponse(
+    val models: List<OllamaModelDto>
+)
+
+/**
+ * Информация о конкретной модели нейросети
+ *
+ * @property name Полное название модели
+ */
+@Serializable
+data class OllamaModelDto(
+    val name: String
+)
