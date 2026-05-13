@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
+import com.kollama.app.presentation.chat.ChatScreen
 import com.kollama.app.presentation.theme.KollamaTheme
 
 class MainActivity : ComponentActivity() {
@@ -17,13 +18,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             KollamaTheme {
-                Scaffold(modifier = Modifier.Companion.fillMaxSize()) { innerPadding ->
-                    Text(
-                        text = "Kollama",
-                        modifier = Modifier.Companion.padding(innerPadding)
-                    )
+                ChatScreen()
                 }
             }
         }
-    }
 }
