@@ -85,7 +85,7 @@ class ChatRepositoryImpl (
         try {
             client.preparePost(fullUrl) {
                 setBody(ChatRequest(
-                    model = Constants.MODEL,
+                    model = model,
                     messages = listOf(ChatMessageDto(role = "user", content = prompt)),
                     stream = true
                 ))
