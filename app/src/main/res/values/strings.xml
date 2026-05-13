@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name">Kollama</string>
+
+    <string name="chat_input_placeholder">Задайте вопрос...</string>
+    <string name="send_description">Отправить</string>
+
+    <string name="menu_description">Открыть историю чатов</string>
+    <string name="settings_description">Настройки сервера и моделей</string>
+
+    <!-- Статусы подключения и информации о сервере -->
+    <string name="status_info_full">Статус: %1$s\nХост: %2$s</string>
+    <string name="status_online">в сети</string>
+    <string name="status_offline">нет связи</string>
+    <string name="status_connecting">подключение...</string>
+    <string name="status_dialog_title">Статус системы</string>
+    <string name="status_dialog_confirm">Понятно</string>
+
+    <!-- Дилог настроек сервера -->
+    <string name="settings_title">Настройки сервера</string>
+    <string name="settings_server_ip">IP-адрес сервера</string>
+    <string name="settings_model_name">Название модели</string>
+    <string name="settings_save">Сохранить</string>
+    <string name="settings_cancel">Отмена</string>
 </resources>
