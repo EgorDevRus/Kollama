@@ -7,7 +7,6 @@ import com.kollama.app.data.mapper.toEntity
 import com.kollama.app.data.remote.dto.*
 import com.kollama.app.domain.model.*
 import com.kollama.app.domain.repository.ChatRepository
-import com.kollama.app.utils.Constants
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.*
@@ -114,7 +113,7 @@ class ChatRepositoryImpl (
 
             val response = client.get(url).body<ModelsResponse>()
             response.models.map { it.name }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emptyList() // Если сервер спит, возвращаем пустой список
         }
     }
