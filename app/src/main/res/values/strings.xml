@@ -6,6 +6,7 @@
 
     <string name="menu_description">Открыть историю чатов</string>
     <string name="settings_description">Настройки сервера и моделей</string>
+    <string name="delete_message_description">Удалить сообщение</string>
 
     <!-- Статусы подключения и информации о сервере -->
     <string name="status_info_full">Статус: %1$s\nХост: %2$s</string>

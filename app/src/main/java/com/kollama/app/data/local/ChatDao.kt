@@ -1,6 +1,7 @@
 package com.kollama.app.data.local
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -37,5 +38,11 @@ interface ChatDao {
      */
     @Query("UPDATE chat_messages SET text = :newText WHERE id = :messageId")
     suspend fun updateMessageText(messageId: String, newText: String)
+
+    /**
+     * Уданение сообщения в чате из БД
+     */
+    @Query("DELETE FROM chat_messages WHERE id = :messageId")
+    suspend fun deleteMessage (messageId: String)
 
 }

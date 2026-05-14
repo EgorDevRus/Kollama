@@ -123,4 +123,10 @@ class ChatRepositoryImpl (
      * @see ChatRepository.clearHistory
      */
     override suspend fun clearHistory(chatId: String) = dao.clearChatHistory(chatId)
+
+    /**
+     * Удаление сообщения
+     * @see ChatRepository.deleteMessage
+     */
+    override suspend fun deleteMessage(id: String) = dao.deleteMessage(id)
 }
