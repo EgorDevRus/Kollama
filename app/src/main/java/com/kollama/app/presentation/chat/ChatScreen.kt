@@ -47,6 +47,9 @@ fun ChatScreen(
         ChatList(
             messages = state.messages,
             listState = listState,
+            onDeleteMessage = { messageId ->
+                viewModel.onEvent(ChatContract.Event.OnDeleteMessageClick(messageId))
+            },
             modifier = Modifier.padding(paddingValues)
         )
     }

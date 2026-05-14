@@ -63,6 +63,9 @@ interface ChatContract {
 
         /** Повторное подключение */
         object OnRetryConnection : Event
+
+        /** Нажатие на кнопку удаления сообщения */
+        data class OnDeleteMessageClick(val id: String) : Event
     }
 
     /** Все статусы сервера */

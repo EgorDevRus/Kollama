@@ -18,6 +18,7 @@ import com.kollama.app.domain.model.MessageRole
 fun ChatList(
     messages: List<ChatMessage>,
     listState: LazyListState,
+    onDeleteMessage: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -30,7 +31,7 @@ fun ChatList(
             items = messages,
             key = {it.id}
         ) { message ->
-            ChatBubble(message = message)
+            ChatBubble(message = message, onDeleteClick = onDeleteMessage)
         }
     }
 }
@@ -65,7 +66,8 @@ fun ChatListPreview() {
 
     ChatList(
         messages = TestMessages,
-        listState = rememberLazyListState()
+        listState = rememberLazyListState(),
+        onDeleteMessage = {}
     )
 }
 

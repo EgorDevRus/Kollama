@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kollama.app.R
 import com.kollama.app.data.local.SettingsManager
+import com.kollama.app.domain.usecase.DeleteMessageUseCase
 import com.kollama.app.domain.usecase.GetChatHistoryUseCase
 import com.kollama.app.domain.usecase.GetModelsUseCase
 import com.kollama.app.domain.usecase.SendMessageUseCase
@@ -36,6 +37,9 @@ import kotlinx.coroutines.launch
  *
  * @property getModelsUseCase Полуечение списка моделей
  * @see GetModelsUseCase
+ *
+ * @property deleteMessageUseCase Удаление сообщения в чате
+ * @see DeleteMessageUseCase
  */
 class ChatViewModel (
     private val chatId: String,
@@ -43,6 +47,7 @@ class ChatViewModel (
     private val getChatHistoryUseCase: GetChatHistoryUseCase,
     private val settingsManager: SettingsManager,
     private val getModelsUseCase: GetModelsUseCase,
+    private val deleteMessageUseCase: DeleteMessageUseCase
 
 ) : ViewModel(){
     private val _state = MutableStateFlow(ChatContract.State(
@@ -116,6 +121,13 @@ class ChatViewModel (
             /** Повторное подключение */
             is ChatContract.Event.OnRetryConnection -> {
                 checkConnection()
+            }
+
+            /** Нажатие на кнопку удаления */
+            is ChatContract.Event.OnDeleteMessageClick -> {
+                viewModelScope.launch {
+                    deleteMessageUseCase(event.id)
+                }
             }
         }
     }
