@@ -23,6 +23,9 @@ room = "2.6.1"
 composeMarkdown = "0.5.0"
 
 [libraries]
+# Icons
+compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
+
 # Ktor
 ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktor" }
 ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }

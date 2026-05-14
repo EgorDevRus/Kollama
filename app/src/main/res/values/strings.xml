@@ -1,13 +1,23 @@
 <resources>
     <string name="app_name">Kollama</string>
 
+    <!-- Label -->
+    <string name="clipboard_label" >Скопированное сообщение Kollama</string>
+    
+    <!-- Компонент ввода текста пользователем -->
     <string name="chat_input_placeholder">Задайте вопрос...</string>
     <string name="send_description">Отправить</string>
 
+    <!-- Описания-->
     <string name="menu_description">Открыть историю чатов</string>
     <string name="settings_description">Настройки сервера и моделей</string>
     <string name="delete_message_description">Удалить сообщение</string>
+    <string name="copy_message_description">Копировать</string>
+    <string name="share_message_description">Поделиться</string>
 
+    <!-- Toast -->
+    <string name="toast_copytext">Текст скопирован</string>
+    
     <!-- Статусы подключения и информации о сервере -->
     <string name="status_info_full">Статус: %1$s\nХост: %2$s</string>
     <string name="status_online">в сети</string>

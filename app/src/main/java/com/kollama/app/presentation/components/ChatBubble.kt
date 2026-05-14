@@ -1,9 +1,15 @@
 package com.kollama.app.presentation.components
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CopyAll
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -12,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,7 +43,9 @@ fun ChatBubble(
 ) {
 
     val isUser = message.role == MessageRole.USER
-
+    val context = LocalContext.current
+    val toastMessageText = stringResource(id = R.string.toast_copytext)
+    val clip_label = stringResource(R.string.clipboard_label)
     val alignment = if (isUser) Alignment.CenterEnd else Alignment.CenterStart
 
     Box(
@@ -69,6 +78,7 @@ fun ChatBubble(
             // Рендер текста в Md формате
             MarkdownText(
                 markdown = message.text,
+                isTextSelectable = true,
                 modifier = Modifier.padding(7.dp),
                 style = MaterialTheme.typography.bodyLarge.copy(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -76,7 +86,6 @@ fun ChatBubble(
 
             )
         }
-            // Иконка корзины для удаления сообщения
             Row(
                 horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically,
@@ -84,6 +93,57 @@ fun ChatBubble(
                     .wrapContentWidth()
                     .padding(top = 2.dp)
             ) {
+                // Кнопка сохранить сообщение
+                IconButton(
+                    onClick = {
+                        val clipboard = context.getSystemService(
+                            android.content.Context.CLIPBOARD_SERVICE
+                        ) as ClipboardManager
+
+                        val clip = ClipData.newPlainText(clip_label, message.text)
+                        clipboard.setPrimaryClip(clip)
+                        Toast.makeText(
+                            context,
+                            toastMessageText,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CopyAll,
+                        contentDescription = stringResource(
+                            id = R.string.copy_message_description
+                        ),
+                        tint = Color.Gray.copy(alpha = 0.6f),
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+
+                // Кнопка поделиться
+                IconButton(
+                    onClick = {
+                        val sendIntent: Intent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, message.text)
+                            type = "text/plain"
+                        }
+                        val shareIntent = Intent.createChooser(sendIntent, null)
+                        context.startActivity(shareIntent)
+                    },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Share,
+                        contentDescription = stringResource(
+                            id = R.string.share_message_description
+                        ),
+                        tint = Color.Gray.copy(alpha = 0.6f),
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+
+                // Кнопка удаления сообщения
                 IconButton(
                     onClick = { onDeleteClick(message.id) },
                     modifier = Modifier.size(32.dp)

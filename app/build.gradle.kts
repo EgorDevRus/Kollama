@@ -44,6 +44,9 @@ android {
 }
 
 dependencies {
+    // Icons
+    implementation(libs.compose.material.icons.extended)
+
     // Ktor
     implementation(libs.ktor.client.android)
     implementation(libs.ktor.client.content.negotiation)
