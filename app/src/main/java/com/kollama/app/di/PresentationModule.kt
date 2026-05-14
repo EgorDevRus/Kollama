@@ -11,7 +11,8 @@ val presentationModule = module {
             sendMessageUseCase = get(),
             getChatHistoryUseCase = get(),
             settingsManager = get(),
-            getModelsUseCase = get()
+            getModelsUseCase = get(),
+            deleteMessageUseCase = get()
         )
     }
 }

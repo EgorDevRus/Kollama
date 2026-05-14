@@ -26,4 +26,7 @@ interface ChatRepository {
 
     /** Получаем список моделей от Ollama */
     suspend fun getModels(ip: String): List<String>
+
+    /** Удаление собщения в чате */
+    suspend fun deleteMessage(id: String)
 }
