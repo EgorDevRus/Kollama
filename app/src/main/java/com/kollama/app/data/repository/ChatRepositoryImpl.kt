@@ -2,11 +2,13 @@ package com.kollama.app.data.repository
 
 import android.util.Log
 import com.kollama.app.data.local.ChatDao
+import com.kollama.app.data.local.ChatEntity
 import com.kollama.app.data.mapper.toDomain
 import com.kollama.app.data.mapper.toEntity
 import com.kollama.app.data.remote.dto.*
 import com.kollama.app.domain.model.*
 import com.kollama.app.domain.repository.ChatRepository
+import com.kollama.app.domain.repository.MessageRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.*
@@ -25,15 +27,19 @@ import java.util.UUID
 class ChatRepositoryImpl (
     private val dao: ChatDao,
     private val client: HttpClient
-) : ChatRepository {
+) : ChatRepository, MessageRepository {
     private fun baseUrl(ip: String) = "http://$ip:11434/api"
     private val jsonParser = Json {
         ignoreUnknownKeys = true
         coerceInputValues = true
     }
+    //
+        //          Взаимодействие с сообщениями
+    //
+
     /**
      * Загружает историю сообщений из локальной БД
-     * @see ChatRepository.getChatHistoryFlow
+     * @see MessageRepository.getChatHistoryFlow
      */
     override fun getChatHistoryFlow(chatId: String): Flow<List<ChatMessage>> =
         dao.getMessageFlow(chatId).map {
@@ -42,7 +48,7 @@ class ChatRepositoryImpl (
 
     /**
      * Сохраняет новое сообщение пользователя в БД
-     * @see ChatRepository.sendMessage
+     * @see MessageRepository.sendMessage
      */
     override suspend fun sendMessage(chatId: String, text: String) {
         val userMsg = ChatMessage (
@@ -58,7 +64,7 @@ class ChatRepositoryImpl (
 
     /**
      * Выполняет сетевой запрос к Ollama и сохраняет полученный ответ
-     * @see ChatRepository.getLiveResponse
+     * @see MessageRepository.getLiveResponse
      */
     override fun getLiveResponse(
         chatId: String,
@@ -120,13 +126,49 @@ class ChatRepositoryImpl (
 
     /**
      * Очищает всю историю сообщений для текущего чата
-     * @see ChatRepository.clearHistory
+     * @see MessageRepository.clearHistory
      */
     override suspend fun clearHistory(chatId: String) = dao.clearChatHistory(chatId)
 
     /**
      * Удаление сообщения
-     * @see ChatRepository.deleteMessage
+     * @see MessageRepository.deleteMessage
      */
     override suspend fun deleteMessage(id: String) = dao.deleteMessage(id)
+
+    //
+        //          Взаимодействие с чатами
+    //
+
+    /** Создание чата в Бд */
+    override suspend fun createChat(chatId: String, name: String) {
+        val currentTime = System.currentTimeMillis()
+        dao.insertChat(
+            ChatEntity(
+                id = chatId,
+                name = name,
+                timestamp = currentTime
+            )
+        )
+    }
+    override suspend fun deleteChat(chatId: String) {
+        dao.deleteChat(chatId = chatId)
+    }
+
+    override fun getAllChats(): Flow<List<Chat>> =
+        dao.getAllChatsFlow().map { entitiesList ->
+            entitiesList.map { entity ->
+                Chat(
+                    id = entity.id,
+                    name = entity.name,
+                    timestamp = entity.timestamp
+                )
+            }
+        }
+
+    override suspend fun updateChatName(chatId: String, newName: String) {
+        dao.updateChatName(chatId = chatId, newName = newName)
+    }
+
+
 }

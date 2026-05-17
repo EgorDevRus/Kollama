@@ -29,6 +29,11 @@ import kotlinx.serialization.json.Json
  */
 fun provideHttpClient(): HttpClient {
     return HttpClient (Android) {
+        engine {
+            connectTimeout = 100_000 // 100 секунд на установку TCP соединения
+            socketTimeout = 100_000  // 100 секунд на ожидание первых данных
+        }
+
         install(ContentNegotiation) {
             json(Json {
                 ignoreUnknownKeys = true
@@ -42,9 +47,9 @@ fun provideHttpClient(): HttpClient {
         }
 
         install(HttpTimeout) {
-            connectTimeoutMillis = 10_000   // Время на подключение
-            socketTimeoutMillis = 60_000    // Время на ожидания между приходом новых чанков текста
-            requestTimeoutMillis = 240_000  // Время на ответ от нейрнки
+            connectTimeoutMillis = 90_000   // Время на подключение
+            socketTimeoutMillis = 90_000    // Время на ожидания между приходом новых чанков текста
+            requestTimeoutMillis = 300_000  // Время на ответ от нейрнки
         }
 
         install(Logging) {

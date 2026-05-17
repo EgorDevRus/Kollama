@@ -5,13 +5,21 @@ import androidx.room.RoomDatabase
 
 
 /**
- * Объединяет сущность таблицы сообщений и методы доступа к ней
+ * Объединяет таблицы сообщений и чатов и методы доступа к ним
+ *
+ * @see MessageEntity
+ * @see ChatEntity
+ *
+ * @see ChatDao
  */
 @Database(
-    entities = [MessageEntity::class],
-    version = 1,
+    entities = [
+        MessageEntity::class,
+        ChatEntity::class
+               ],
+    version = 2,
     exportSchema = false
 )
-abstract class ChatDatabase : RoomDatabase(){
+abstract class ChatDatabase : RoomDatabase() {
     abstract fun chatDao(): ChatDao
 }
