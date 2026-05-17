@@ -5,14 +5,12 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val presentationModule = module {
-    viewModel {
+    viewModel { (chatId: String) ->
         ChatViewModel(
-            chatId = "Defualt_chat",
-            sendMessageUseCase = get(),
-            getChatHistoryUseCase = get(),
+            messagesUseCase = get(),
             settingsManager = get(),
-            getModelsUseCase = get(),
-            deleteMessageUseCase = get()
+            chatsUseCase = get()
+
         )
     }
 }
