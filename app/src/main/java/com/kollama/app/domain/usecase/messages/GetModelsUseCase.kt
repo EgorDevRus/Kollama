@@ -1,6 +1,6 @@
-package com.kollama.app.domain.usecase
+package com.kollama.app.domain.usecase.messages
 
-import com.kollama.app.domain.repository.ChatRepository
+import com.kollama.app.domain.repository.MessageRepository
 
 /**
  * Юзкейс для получения списка установленных моделей с сервера Ollama
@@ -8,8 +8,10 @@ import com.kollama.app.domain.repository.ChatRepository
  * Используется для:
  * 1. Проверки доступности сервера (пинга)
  * 2. Предоставления пользователю списка моделей для выбора в настройках
+ *
+ * @see MessageRepository
  */
-class GetModelsUseCase(private val repository: ChatRepository) {
+class GetModelsUseCase(private val repository: MessageRepository) {
 
     /**
      * Запрашивает список имен моделей у репозитория

@@ -1,15 +1,16 @@
-package com.kollama.app.domain.usecase
+package com.kollama.app.domain.usecase.messages
 
-import com.kollama.app.domain.repository.ChatRepository
+import com.kollama.app.domain.repository.MessageRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 
 /**
  * Отправка запроса нейросети и ответ от нее в реальном времени
+ *
+ * @see MessageRepository
  */
-
-class SendMessageUseCase (private val repository: ChatRepository) {
+class SendMessageUseCase (private val repository: MessageRepository) {
     /**
      * @param chatId Уникальный идентификатор чата
      * @param text Текст сообщения от пользователя

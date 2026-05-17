@@ -1,12 +1,12 @@
-package com.kollama.app.domain.usecase
+package com.kollama.app.domain.usecase.messages
 
-import com.kollama.app.domain.repository.ChatRepository
+import com.kollama.app.domain.repository.MessageRepository
 
 /**
  * Удаление сообщения в чате
- * @see ChatRepository
+ * @see MessageRepository
  */
-class DeleteMessageUseCase (private val repository: ChatRepository){
+class DeleteMessageUseCase (private val repository: MessageRepository){
 
     /** Удаляет сообщение из чата
      * @param id Айди сообщения в чате

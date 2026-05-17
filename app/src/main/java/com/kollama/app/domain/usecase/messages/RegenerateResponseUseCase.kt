@@ -1,11 +1,14 @@
-package com.kollama.app.domain.usecase
+package com.kollama.app.domain.usecase.messages
 
-import com.kollama.app.domain.repository.ChatRepository
+import com.kollama.app.domain.repository.MessageRepository
 import kotlinx.coroutines.flow.Flow
+
 /**
  * Перегенерация запроса
+ *
+ * @see MessageRepository
  */
-class RegenerateResponseUseCase (private val repository: ChatRepository){
+class RegenerateResponseUseCase (private val repository: MessageRepository){
     /**
      * Запускает поток получения текста
      * @param chatId Уникальный идентификатор чата
