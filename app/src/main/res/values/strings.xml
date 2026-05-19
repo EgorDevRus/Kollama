@@ -3,18 +3,21 @@
 
     <!-- Label -->
     <string name="clipboard_label" >Скопированное сообщение Kollama</string>
-    
+
     <!-- Компонент ввода текста пользователем -->
     <string name="chat_input_placeholder">Задайте вопрос...</string>
     <string name="send_description">Отправить</string>
 
     <!-- Описания-->
     <string name="menu_description">Открыть историю чатов</string>
-    <string name="settings_description">Настройки сервера и моделей</string>
+    <string name="settings_description">Настройки сервера</string>
     <string name="delete_message_description">Удалить сообщение</string>
     <string name="copy_message_description">Копировать</string>
     <string name="share_message_description">Поделиться</string>
-
+    <string name="delete_chat_description">Удалить чат</string>
+    <string name="chose_model_description">Выбор модели</string>
+    <string name="update_ip_description">Обновить IP</string>
+    <string name="button_regenerate_description">Перегенерировать ответ</string>
     <!-- Toast -->
     <string name="toast_copytext">Текст скопирован</string>
     
@@ -32,4 +35,8 @@
     <string name="settings_model_name">Название модели</string>
     <string name="settings_save">Сохранить</string>
     <string name="settings_cancel">Отмена</string>
+    <string name="model_button">Модели не найдены</string>
+
+
+    <string name="new_chat">Создать новый чат</string>
 </resources>

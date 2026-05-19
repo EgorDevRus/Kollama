@@ -5,7 +5,8 @@ import com.kollama.app.di.databaseModule
 import com.kollama.app.di.networkModule
 import com.kollama.app.di.presentationModule
 import com.kollama.app.di.repositoryModule
-import com.kollama.app.di.useCaseModule
+import com.kollama.app.di.messagesModule
+import com.kollama.app.di.chatsModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -16,10 +17,11 @@ class KollamaApp : Application() {
         startKoin {
             androidContext(this@KollamaApp)
             modules(
+                chatsModule,
                 networkModule,
                 databaseModule,
                 repositoryModule,
-                useCaseModule,
+                messagesModule,
                 presentationModule
             )
         }
