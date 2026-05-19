@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CopyAll
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,13 +40,15 @@ import com.kollama.app.R
 fun ChatBubble(
     message: ChatMessage,
     onDeleteClick: (String) -> Unit,
+    onRegenerateClick: () -> Unit,
+    isLastMessage: Boolean,
     modifier: Modifier = Modifier
 ) {
 
     val isUser = message.role == MessageRole.USER
     val context = LocalContext.current
     val toastMessageText = stringResource(id = R.string.toast_copytext)
-    val clip_label = stringResource(R.string.clipboard_label)
+    val clipLabel = stringResource(R.string.clipboard_label)
     val alignment = if (isUser) Alignment.CenterEnd else Alignment.CenterStart
 
     Box(
@@ -100,7 +103,7 @@ fun ChatBubble(
                             android.content.Context.CLIPBOARD_SERVICE
                         ) as ClipboardManager
 
-                        val clip = ClipData.newPlainText(clip_label, message.text)
+                        val clip = ClipData.newPlainText(clipLabel, message.text)
                         clipboard.setPrimaryClip(clip)
                         Toast.makeText(
                             context,
@@ -157,6 +160,23 @@ fun ChatBubble(
                         modifier = Modifier.size(16.dp)
                     )
                 }
+
+                // Кнопка перегенерации
+                if (!isUser && isLastMessage) {
+                    IconButton(
+                        onClick = onRegenerateClick,
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = stringResource(
+                                id = R.string.button_regenerate_description
+                            ),
+                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
             }
         }
     }
@@ -182,7 +202,9 @@ fun ChatBubblePreview() {
                     role = MessageRole.USER,
                     timestamp = System.currentTimeMillis()
                 ),
-                onDeleteClick = {}
+                onDeleteClick = {},
+                onRegenerateClick = {},
+                isLastMessage = false
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -197,7 +219,9 @@ fun ChatBubblePreview() {
                     role = MessageRole.ASSISTANT,
                     timestamp = System.currentTimeMillis()
                 ),
-                onDeleteClick = {}
+                onDeleteClick = {},
+                onRegenerateClick = {},
+                isLastMessage = true
             )
         }
     }

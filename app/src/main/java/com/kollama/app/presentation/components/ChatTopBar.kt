@@ -59,7 +59,7 @@ fun ChatTopBar(
             )
         },
 
-        // Настройки
+        // Настройки IP
         actions = {
             IconButton(onClick = showSettings) {
                 Icon(
