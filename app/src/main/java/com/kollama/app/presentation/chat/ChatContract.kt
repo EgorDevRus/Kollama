@@ -2,6 +2,7 @@ package com.kollama.app.presentation.chat
 
 import androidx.compose.ui.graphics.Color
 import com.kollama.app.R
+import com.kollama.app.domain.model.Chat
 import com.kollama.app.domain.model.ChatMessage
 import com.kollama.app.presentation.theme.StatusBlue
 import com.kollama.app.utils.Constants
@@ -26,11 +27,17 @@ interface ChatContract {
      * @property connectionStatus Статус подключения
      * @property connectionStatusText текст при определённом статусе
      * @property connectionStatusColor Цвет при определённом статусе
+     * @property currentChatId Айди текущего чата
+     * @property chats Список всех созданных чатов
      */
     data class State(
+
+        // Сообщения
         val messages: List<ChatMessage> = emptyList(),
         val isLoading: Boolean = false,
         val userInput: String = "",
+
+        // Настройки и статус
         val isSettingsDialogVisible: Boolean = false,
         val isInfoDialogVisible: Boolean = false,
         val availableModels: List<String> = emptyList(),
@@ -38,7 +45,11 @@ interface ChatContract {
         val serverIp: String = Constants.IP,
         val connectionStatus: ConnectionStatus = ConnectionStatus.Connecting,
         val connectionStatusText: Int = R.string.status_connecting,
-        val connectionStatusColor: Color = StatusBlue
+        val connectionStatusColor: Color = StatusBlue,
+
+        // Чаты
+        val currentChatId: String = "",
+        val chats: List<Chat> = emptyList()
     )
     /** Список действий пользователя на экране */
     sealed interface Event {
@@ -66,6 +77,23 @@ interface ChatContract {
 
         /** Нажатие на кнопку удаления сообщения */
         data class OnDeleteMessageClick(val id: String) : Event
+
+            // Взаимодействие с чатами
+        /** Нажатие на кнопку создания нового чата */
+        object OnCreateChatClick : Event
+
+        /** Выбор чата */
+        data class OnChatSelect(val chatId: String) : Event
+
+        /** Удаление чата */
+        data class OnChatDelete(val chatId: String) : Event
+
+        /** Обновление названия чата */
+        data class OnChatRename(val chatId: String, val newName: String) : Event
+
+        /** Нажатие на кнопку повтороной генерации */
+        object OnRegenerateClick : Event
+
     }
 
     /** Все статусы сервера */

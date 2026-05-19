@@ -4,18 +4,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kollama.app.R
 import com.kollama.app.data.local.SettingsManager
-import com.kollama.app.domain.usecase.DeleteMessageUseCase
-import com.kollama.app.domain.usecase.GetChatHistoryUseCase
-import com.kollama.app.domain.usecase.GetModelsUseCase
-import com.kollama.app.domain.usecase.SendMessageUseCase
+import com.kollama.app.domain.model.MessageRole
+import com.kollama.app.domain.usecase.chats.ChatsUseCase
+import com.kollama.app.domain.usecase.messages.MessagesUseCase
 import com.kollama.app.presentation.theme.StatusBlue
 import com.kollama.app.presentation.theme.StatusGreen
 import com.kollama.app.presentation.theme.StatusRed
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 
 /**
@@ -24,30 +24,21 @@ import kotlinx.coroutines.launch
  * Связь между пользовательским интерфейсом и бизнес-логикой (UseCase)
  * обрабатывая действия пользователя и обновляя состояние экрана
  *
- * @property chatId Уникальный идентификатор текущего диалога
+ * @property messagesUseCase Взаимодествие с сообщениями
+ * @see messagesUseCase
  *
- * @property sendMessageUseCase Отправка сообщения и получение ответа
- * @see SendMessageUseCase
- *
- * @property getChatHistoryUseCase Получения истории сообщений из локальной БД
- * @see GetChatHistoryUseCase
- *
- * @property settingsManager Хранение состояний настроек
+  * @property settingsManager Хранение состояний настроек
  * @see SettingsManager
  *
- * @property getModelsUseCase Полуечение списка моделей
- * @see GetModelsUseCase
+ * @property chatsUseCase Взаимодествие с чатами
+ * @see chatsUseCase
  *
- * @property deleteMessageUseCase Удаление сообщения в чате
- * @see DeleteMessageUseCase
  */
 class ChatViewModel (
-    private val chatId: String,
-    private val sendMessageUseCase: SendMessageUseCase,
-    private val getChatHistoryUseCase: GetChatHistoryUseCase,
+
+    private val messagesUseCase: MessagesUseCase,
     private val settingsManager: SettingsManager,
-    private val getModelsUseCase: GetModelsUseCase,
-    private val deleteMessageUseCase: DeleteMessageUseCase
+    private val chatsUseCase: ChatsUseCase
 
 ) : ViewModel(){
     private val _state = MutableStateFlow(ChatContract.State(
@@ -55,16 +46,30 @@ class ChatViewModel (
         selectedModel = settingsManager.getModel()
     ))
     val state = _state.asStateFlow()
-
+    private var messagesJob: kotlinx.coroutines.Job? = null
+    private var apiJob: kotlinx.coroutines.Job? = null
 
 
     init {
+        viewModelScope.launch {
 
-        // Вывод сообщений из БД
-        loadMessages(chatId)
+            // Загрузка всех чатов
+            loadChats()
 
-        // Проверка подключения
-        checkConnection()
+            val startChatId = _state.value.currentChatId.ifBlank {
+                UUID.randomUUID().toString()
+            }
+
+
+            _state.update { it.copy(currentChatId = startChatId) }
+
+            // Вывод сообщений из БД
+            loadMessages(startChatId)
+
+            // Проверка подключения
+            checkConnection()
+        }
+
     }
 
     fun onEvent(event: ChatContract.Event) {
@@ -78,9 +83,7 @@ class ChatViewModel (
             }
 
             /** Пользователь отправляет запрос */
-            is ChatContract.Event.SendClick -> {
-                send()
-            }
+            is ChatContract.Event.SendClick -> send()
 
             /** Нажатие кнопки настроек */
             is ChatContract.Event.SettingsClick -> {
@@ -126,16 +129,90 @@ class ChatViewModel (
             /** Нажатие на кнопку удаления */
             is ChatContract.Event.OnDeleteMessageClick -> {
                 viewModelScope.launch {
-                    deleteMessageUseCase(event.id)
+                    messagesUseCase.deleteMessage(event.id)
+
+                    // Нажали на кнопку у последнего сообщения в чате
+                    if (_state.value.messages.size <= 1) {
+
+                        // Удаляем чат из БД
+                        chatsUseCase.deleteChat(_state.value.currentChatId)
+
+                        createNewChat()
+                    }
+                }
+            }
+
+            /** Нажатие на кнопку повторной генерации */
+            is ChatContract.Event.OnRegenerateClick -> regenerateLastResponse()
+
+            //
+                //          Чаты
+            //
+            /** Нажатие на кнопку создания чата */
+            is ChatContract.Event.OnCreateChatClick -> createNewChat()
+
+            /** Выбор чата */
+            is ChatContract.Event.OnChatSelect -> loadMessages(event.chatId)
+
+            /** Удаление чата */
+            is ChatContract.Event.OnChatDelete -> removeChat(event.chatId)
+
+            /** Обновление названия чата */
+            is ChatContract.Event.OnChatRename -> renameChat(event.chatId, event.newName)
+
+
+        }
+    }
+
+    private fun regenerateLastResponse() {
+        if (_state.value.isLoading) return
+
+        val currentChat = _state.value.currentChatId
+        val messagesList = _state.value.messages
+
+        apiJob?.cancel()
+
+        apiJob = viewModelScope.launch {
+            // Находим последнее сообщение от ИИ и пользователя
+            val lastAssistantMessage = messagesList.lastOrNull { it.role == MessageRole.ASSISTANT }
+            val lastUserMessage = messagesList.lastOrNull { it.role == MessageRole.USER }
+
+            if (lastUserMessage != null) {
+                _state.update { it.copy(isLoading = true) }
+                // Удаляем ответ нейронки
+                try {
+                    lastAssistantMessage?.let {
+                        messagesUseCase.deleteMessage(it.id)
+                        delay(50)
+                    }
+                    // Повторно отправляем текст последнего вопроса
+                    messagesUseCase.regenerateResponse(
+                        chatId = currentChat,
+                        prompt = lastUserMessage.text,
+                        ip = _state.value.serverIp,
+                        model = _state.value.selectedModel
+                    ).collect {
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                } finally {
+                    _state.update { it.copy(isLoading = false) }
                 }
             }
         }
     }
 
+
+
+
     /** Показывает все сообщения в чате */
-    private fun loadMessages(id: String) {
-        viewModelScope.launch {
-            getChatHistoryUseCase(id).collect { list ->
+    private fun loadMessages(chatId: String) {
+        _state.update { it.copy(currentChatId = chatId) }
+
+        messagesJob?.cancel()
+
+        messagesJob = viewModelScope.launch {
+            messagesUseCase.getChatHistory(chatId).collect { list ->
                 _state.update { it.copy(messages = list) }
             }
         }
@@ -145,26 +222,53 @@ class ChatViewModel (
     private fun send() {
         // Текст пользователя
         val textToSend = _state.value.userInput
+        if (textToSend.isBlank() || _state.value.isLoading) return
 
-        if (textToSend.isBlank()) return
+        val currentChat = _state.value.currentChatId
+        val chatExists = _state.value.chats.any { it.id == currentChat }
+        val isFirstMessage = !chatExists
+
+        _state.update {
+            it.copy(
+                userInput = "",
+                isLoading = true
+            )
+        }
         viewModelScope.launch {
-            _state.update { it.copy(userInput = "", isLoading = true) }
-            sendMessageUseCase(
-                chatId = chatId,
-                text = textToSend,
-                ip = _state.value.serverIp,
-                model = _state.value.selectedModel
-                ).collect { _ ->
-                    _state.update { it.copy(isLoading = false) }
+            try {
+                // Чат по названию первого сообщения
+                if (isFirstMessage) {
+                    val cleanName = if (textToSend.length > 10) {
+                        textToSend.take(10)
+                    } else {
+                        textToSend
+                    }
+                    chatsUseCase.createChat(currentChat, cleanName)
+                }
+
+                messagesUseCase.sendMessage(
+                    chatId = currentChat,
+                    text = textToSend,
+                    ip = _state.value.serverIp,
+                    model = _state.value.selectedModel
+                ).collect {
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                _state.update {
+                    it.copy(isLoading = false)
+                }
             }
         }
+
     }
 
     /** Проверка подключения */
     private fun checkConnection() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
 
-            // Статус: подключения
+            // Статус: подключение
             _state.update { it.copy(
                 connectionStatus = ChatContract.ConnectionStatus.Connecting,
                 connectionStatusText = R.string.status_connecting,
@@ -172,7 +276,7 @@ class ChatViewModel (
             )}
 
             val currentIp = settingsManager.getIp()
-            val models = getModelsUseCase(currentIp)
+            val models = messagesUseCase.getModelsUseCase(currentIp)
 
             // Статус: подключён
             if (models.isNotEmpty()) {
@@ -191,6 +295,41 @@ class ChatViewModel (
                 )}
             }
         }
+    }
+
+    // Логика чатов
+
+
+    private fun  loadChats() {
+        viewModelScope.launch {
+            chatsUseCase.getAllChats().collect { chatList ->
+                _state.update { it.copy(chats = chatList) }
+            }
+        }
+    }
+
+    private fun createNewChat() {
+
+        val newId = UUID.randomUUID().toString()
+
+        _state.update { it.copy(messages = emptyList()) }
+
+        loadMessages(newId)
+    }
+    private fun removeChat(chatId: String) {
+        viewModelScope.launch {
+            chatsUseCase.deleteChat(chatId)
+
+            if (_state.value.currentChatId == chatId){
+                createNewChat()
+            }
+        }
+    }
+    private fun renameChat(chatId: String, newName: String) {
+        viewModelScope.launch {
+            chatsUseCase.updateChatName(chatId = chatId, newName = newName)
+        }
+
     }
 
 }
